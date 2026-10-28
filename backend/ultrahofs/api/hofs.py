@@ -226,10 +226,10 @@ def get_cif(entry_id: int, kind: str = Query("framework", pattern="^(raw|framewo
     if kind == "display":
         text = _display_cif(e)
     else:
-        path = e.cif_raw_path if kind == "raw" else (e.cif_clean_path or e.cif_raw_path)
-        if not path or not Path(path).exists():
+        path = get_settings().var_path(e.cif_raw_path if kind == "raw" else (e.cif_clean_path or e.cif_raw_path))
+        if path is None or not path.exists():
             raise HTTPException(404, "no CIF stored for this entry")
-        text = Path(path).read_text(errors="replace")
+        text = path.read_text(errors="replace")
     headers = {}
     if download:
         fname = f"{e.name or 'hof'}_{kind}.cif".replace(" ", "_").replace("/", "_")
@@ -239,19 +239,25 @@ def get_cif(entry_id: int, kind: str = Query("framework", pattern="^(raw|framewo
 
 def _display_cif(e: HOFEntry) -> str:
     """Clean P1 CIF for the 3D viewer (guest-free framework if available, else normalised raw CIF)."""
-    if e.cif_clean_path and Path(e.cif_clean_path).exists():
-        return Path(e.cif_clean_path).read_text(errors="replace")
-    if not e.cif_raw_path or not Path(e.cif_raw_path).exists():
-        raise HTTPException(404, "no CIF stored for this entry")
-    cache = get_settings().var_dir / "cif" / "display" / f"{e.id}.cif"
+    s = get_settings()
+    clean, raw = s.var_path(e.cif_clean_path), s.var_path(e.cif_raw_path)
+    if clean is not None and clean.exists():
+        return clean.read_text(errors="replace")
+    cache = display_cache_path(e.id)
     if cache.exists():
         return cache.read_text()
+    if raw is None or not raw.exists():
+        raise HTTPException(404, "no CIF stored for this entry")
     from ..analysis.cif_molecules import read_cif
     from ..crystal.export import write_cif
 
     try:
-        atoms = read_cif(Path(e.cif_raw_path).read_text(errors="replace"))
+        atoms = read_cif(raw.read_text(errors="replace"))
+        if len(atoms) > MAX_DISPLAY_ATOMS:
+            raise HTTPException(422, f"structure has {len(atoms)} atoms; too large for the 3D viewer")
         text = write_cif(atoms, f"entry-{e.id}")
+    except HTTPException:
+        raise
     except Exception as ex:  # noqa: BLE001
         # some dataset files are not CIFs (e.g. Mol2 saved as .cif); use HOFSyn's processed P1 CIF instead
         processed = _processed_hofsyn_cif(e)
@@ -261,6 +267,13 @@ def _display_cif(e: HOFEntry) -> str:
     cache.parent.mkdir(parents=True, exist_ok=True)
     cache.write_text(text)
     return text
+
+
+def display_cache_path(entry_id: int) -> Path:
+    return get_settings().var_dir / "cif" / "display" / f"{entry_id}.cif"
+
+
+MAX_DISPLAY_ATOMS = 60_000
 
 
 def _processed_hofsyn_cif(e: HOFEntry) -> Path | None:
@@ -439,11 +452,13 @@ async def upload_cif(entry_id: int, file: UploadFile = File(...), analyze: bool 
     data = await file.read()
     if len(data) > 20_000_000:
         raise HTTPException(413, "CIF too large")
-    d = get_settings().var_dir / "cif" / "raw"
+    s = get_settings()
+    d = s.var_dir / "cif" / "raw"
     d.mkdir(parents=True, exist_ok=True)
     path = d / f"{e.id}.cif"
     path.write_bytes(data)
-    e.cif_raw_path = str(path)
+    e.cif_raw_path = s.rel_var_path(path)
+    display_cache_path(e.id).unlink(missing_ok=True)
     msg = "stored"
     if analyze:
         from ..ingest.hofsyn import _evidence, analyze_cif_file
@@ -463,10 +478,10 @@ async def upload_cif(entry_id: int, file: UploadFile = File(...), analyze: bool 
                     ev[k] = computed[k]
             e.evidence = ev
             if res.get("framework_cif"):
-                fp = get_settings().var_dir / "cif" / "framework" / f"{e.id}.cif"
+                fp = s.var_dir / "cif" / "framework" / f"{e.id}.cif"
                 fp.parent.mkdir(parents=True, exist_ok=True)
                 fp.write_text(res["framework_cif"])
-                e.cif_clean_path = str(fp)
+                e.cif_clean_path = s.rel_var_path(fp)
             msg = "stored and analysed"
         except Exception as ex:  # noqa: BLE001
             msg = f"stored; analysis failed: {str(ex)[:200]}"

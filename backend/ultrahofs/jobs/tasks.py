@@ -36,7 +36,7 @@ def task_relax(job_id: int, params: dict, ctx: TaskContext) -> dict:
         cif_path, name, owner_id, org_id = src.cif_path, src.name, src.owner_id, src.org_id
         dim = src.dimensionality
         components, topology = src.components, src.topology
-    atoms = read(cif_path, format="cif")
+    atoms = read(get_settings().var_path(cif_path), format="cif")
     ctx.log(f"relaxing {name}: {len(atoms)} atoms with {params.get('engine', 'mace_off24')}")
     res = relax(atoms, engine=params.get("engine", "mace_off24"), fmax_atoms=params.get("fmax_atoms", 0.05),
                 fmax_cell=params.get("fmax_cell", 0.02), steps_atoms=params.get("steps_atoms", 400),
@@ -66,9 +66,9 @@ def task_relax(job_id: int, params: dict, ctx: TaskContext) -> dict:
             options={"relaxed_from": params["structure_id"]}, qc=qc, analysis=analysis,
             relax=res, parent_id=params["structure_id"], status="relaxed",
         )
-        traj = Path(st.cif_path).with_suffix(".traj.xyz")
+        traj = get_settings().var_path(st.cif_path).with_suffix(".traj.xyz")
         traj.write_text(frames_to_extxyz(frames))
-        st.relax = dict(res, trajectory_path=str(traj), cell_before=cell_dict(atoms), cell_after=cell_dict(out),
+        st.relax = dict(res, trajectory_path=get_settings().rel_var_path(traj), cell_before=cell_dict(atoms), cell_after=cell_dict(out),
                         density_before=density(atoms), density_after=density(out))
         new_id = st.id
     ctx.log(f"done: ΔE = {res['energy_change_eV']} eV, ΔV = {res['volume_change_pct']}%")
@@ -122,7 +122,7 @@ def task_analyze(job_id: int, params: dict, ctx: TaskContext) -> dict:
     with session_scope() as db:
         st = db.get(GeneratedStructure, params["structure_id"])
         path, dim = st.cif_path, st.dimensionality
-    atoms = read(path, format="cif")
+    atoms = read(get_settings().var_path(path), format="cif")
     qc = quality_report(atoms, expected_dim=dim)
     pore = analyze_porosity(atoms)
     with session_scope() as db:

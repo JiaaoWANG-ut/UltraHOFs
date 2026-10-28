@@ -1,5 +1,7 @@
 # UltraHOFs 使用指南 / User guide
 
+> 不想安装？用 GitHub Codespaces 在线试用：见 [README 的「在线试用」](../README.md#在线试用无需安装-try-it-online)，打开后在登录页点 **一键进入试用**。
+
 ## 1. 实验数据库 · Experimental database
 
 - **检索**：左侧可按名称、DOI、作者、CCDC 编号检索，并可按合成子、氢键类型、拓扑、年份、氢键网络维度、几何孔隙、电荷辅助筛选。

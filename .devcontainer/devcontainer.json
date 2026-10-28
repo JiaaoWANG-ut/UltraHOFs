@@ -1,0 +1,19 @@
+{
+  // UltraHOFs online trial in GitHub Codespaces: the prebuilt image already contains the platform and the
+  // experimental HOF database; the service starts automatically and opens in the browser on port 8000.
+  "name": "UltraHOFs 在线试用 / online trial",
+  "image": "ghcr.io/jiaaowang-ut/ultrahofs:0.1.0",
+  "containerEnv": {
+    // password-less "一键进入试用" login; safe here because Codespaces ports are private to the codespace owner
+    "ULTRAHOFS_DEMO_MODE": "true"
+  },
+  "postStartCommand": "ultrahofs-codespaces-start",
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": { "label": "UltraHOFs", "onAutoForward": "openBrowser" }
+  },
+  "hostRequirements": { "cpus": 2, "memory": "8gb" },
+  "customizations": {
+    "codespaces": { "openFiles": ["README.md"] }
+  }
+}

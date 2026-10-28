@@ -7,6 +7,11 @@ def test_health(client):
     assert client.get("/api/v1/health").json()["status"] == "ok"
 
 
+def test_demo_login_is_off_unless_demo_mode(client):
+    assert client.get("/api/v1/health").json()["demo_mode"] is False
+    assert client.post("/api/v1/auth/demo").status_code == 404
+
+
 def test_unknown_api_path_is_json_404_not_the_web_ui(client):
     r = client.get("/api/v1/no-such-endpoint")
     assert r.status_code == 404

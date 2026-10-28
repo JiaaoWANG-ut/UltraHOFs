@@ -49,6 +49,11 @@ class Settings(BaseSettings):
 
     enable_csd: bool = True
 
+    web_dir: Path | None = None  # built web UI; default <repo>/frontend/dist
+    seed_dir: Path | None = None  # data bundle copied into an empty installation (see `ultrahofs export-seed`)
+    demo_mode: bool = False  # password-less "demo" login for private trial environments (e.g. Codespaces)
+    admin_password: str = ""  # initial admin password; random (printed + saved under var/) when empty
+
     @property
     def artifacts_dir(self) -> Path:
         return self.var_dir / "artifacts"
@@ -56,6 +61,21 @@ class Settings(BaseSettings):
     @property
     def cache_dir(self) -> Path:
         return self.var_dir / "cache"
+
+    def var_path(self, p: str | Path | None) -> Path | None:
+        """Resolve a file path stored in the database; relative paths are relative to ``var_dir``."""
+        if not p:
+            return None
+        p = Path(p)
+        return p if p.is_absolute() else self.var_dir / p
+
+    def rel_var_path(self, p: str | Path) -> str:
+        """Path to store in the database: relative to ``var_dir`` when inside it, so data stay portable."""
+        p = Path(p)
+        try:
+            return p.resolve().relative_to(self.var_dir.resolve()).as_posix()
+        except ValueError:
+            return str(p)
 
     def resolved_database_url(self) -> str:
         return self.database_url or f"sqlite:///{self.var_dir / 'ultrahofs.db'}"

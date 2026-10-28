@@ -96,11 +96,12 @@ def save_structure(db: Session, *, owner_id: int, org_id: int, name: str, atoms:
     )
     db.add(st)
     db.flush()
-    d = get_settings().var_dir / "structures"
+    s = get_settings()
+    d = s.var_dir / "structures"
     d.mkdir(parents=True, exist_ok=True)
     path = d / f"{st.id}.cif"
     path.write_text(write_cif(atoms, st.name))
-    st.cif_path = str(path)
+    st.cif_path = s.rel_var_path(path)
     return st
 
 
@@ -114,8 +115,7 @@ def structure_dict(st: GeneratedStructure, with_cif: bool = False) -> dict:
     }
     if with_cif and st.cif_path:
         try:
-            with open(st.cif_path) as f:
-                d["cif"] = f.read()
+            d["cif"] = get_settings().var_path(st.cif_path).read_text()
         except OSError:
             d["cif"] = ""
     return d

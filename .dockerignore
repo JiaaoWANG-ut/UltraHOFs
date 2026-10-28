@@ -1,0 +1,15 @@
+# Allow-list: only what deploy/Dockerfile needs (keeps var/, data/raw/ and node_modules out of the context)
+**
+!backend/
+!frontend/
+!deploy/
+!LICENSE
+!THIRD_PARTY_NOTICES.md
+**/__pycache__
+**/*.egg-info
+**/.pytest_cache
+**/.ruff_cache
+frontend/node_modules
+frontend/dist
+frontend/test-results
+frontend/playwright-report

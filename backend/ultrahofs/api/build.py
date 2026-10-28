@@ -14,6 +14,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..chem.standardize import MoleculeInputError
+from ..config import get_settings
 from ..crystal.assemble import AssemblyError, recommend_binodal_for_bb, recommend_for_bb
 from ..crystal.bb import BuildingBlockError
 from ..crystal.export import FORMATS, export
@@ -191,8 +192,12 @@ def delete_structure(sid: int, user: User = Depends(current_user), db: Session =
         raise HTTPException(403, "only the owner can delete")
     for child in db.execute(select(GeneratedStructure).where(GeneratedStructure.parent_id == st.id)).scalars():
         child.parent_id = None
+    s = get_settings()
     if st.cif_path:
-        Path(st.cif_path).unlink(missing_ok=True)
+        s.var_path(st.cif_path).unlink(missing_ok=True)
+    traj = s.var_path((st.relax or {}).get("trajectory_path"))
+    if traj is not None:
+        traj.unlink(missing_ok=True)
     db.delete(st)
     db.commit()
     return {"ok": True}
@@ -204,7 +209,7 @@ def export_structure(sid: int, format: str = Query("cif"), user: User = Depends(
     if format not in FORMATS:
         raise HTTPException(422, f"format must be one of {list(FORMATS)}")
     st = _own(db, sid, user)
-    atoms = ase_read(st.cif_path, format="cif")
+    atoms = ase_read(get_settings().var_path(st.cif_path), format="cif")
     text = export(atoms, format, st.name)
     label, mime, ext = FORMATS[format]
     fname = f"{st.name or 'structure'}".replace(" ", "_").replace("/", "_")[:60]
@@ -217,10 +222,10 @@ def export_structure(sid: int, format: str = Query("cif"), user: User = Depends(
 @router.get("/structures/{sid}/trajectory", tags=["structures"])
 def trajectory(sid: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> Response:
     st = _own(db, sid, user)
-    p = (st.relax or {}).get("trajectory_path")
-    if not p or not Path(p).exists():
+    p = get_settings().var_path((st.relax or {}).get("trajectory_path"))
+    if p is None or not p.exists():
         raise HTTPException(404, "no trajectory")
-    return PlainTextResponse(Path(p).read_text(), media_type="chemical/x-xyz",
+    return PlainTextResponse(p.read_text(), media_type="chemical/x-xyz",
                              headers={"Content-Disposition": f'attachment; filename="relax_{st.id}.xyz"'})
 
 
@@ -229,7 +234,7 @@ def analyze_structure(sid: int, user: User = Depends(current_user), db: Session 
     from ..crystal.qc import quality_report
 
     st = _own(db, sid, user)
-    atoms = ase_read(st.cif_path, format="cif")
+    atoms = ase_read(get_settings().var_path(st.cif_path), format="cif")
     qc = quality_report(atoms, expected_dim=st.dimensionality)
     analysis = dict(st.analysis or {}, qc=qc)
     try:
@@ -252,8 +257,6 @@ class RelaxIn(BaseModel):
 
 @router.post("/structures/{sid}/relax", tags=["structures"])
 def relax_structure(sid: int, body: RelaxIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    from ..config import get_settings
-
     st = _own(db, sid, user)
     if st.n_atoms > get_settings().max_relax_atoms:
         raise HTTPException(422, f"structure has {st.n_atoms} atoms; relaxation limit is "

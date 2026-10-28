@@ -10,10 +10,18 @@ from sqlalchemy import select
 
 
 def cmd_init_db(_args: argparse.Namespace) -> None:
-    from .db import init_db
+    from .bootstrap import bootstrap
 
-    init_db()
+    bootstrap()
     print("database initialised")
+
+
+def cmd_export_seed(args: argparse.Namespace) -> None:
+    from pathlib import Path
+
+    from .bootstrap import export_seed
+
+    export_seed(Path(args.out_dir), strip=not args.keep_diffraction)
 
 
 def cmd_create_user(args: argparse.Namespace) -> None:
@@ -128,7 +136,13 @@ def cmd_serve(args: argparse.Namespace) -> None:
 def main(argv: list[str] | None = None) -> None:
     p = argparse.ArgumentParser(prog="ultrahofs", description="UltraHOFs platform CLI")
     sub = p.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("init-db").set_defaults(func=cmd_init_db)
+    sub.add_parser("init-db", help="create tables, load the bundled data (ULTRAHOFS_SEED_DIR) into an empty "
+                                    "installation and create the first administrator").set_defaults(func=cmd_init_db)
+    es = sub.add_parser("export-seed", help="write the experimental database + CIFs as a portable data bundle")
+    es.add_argument("out_dir")
+    es.add_argument("--keep-diffraction", action="store_true",
+                    help="keep embedded SHELX hkl/fab/res data in the raw CIFs")
+    es.set_defaults(func=cmd_export_seed)
     u = sub.add_parser("create-user")
     u.add_argument("--username", required=True)
     u.add_argument("--password")

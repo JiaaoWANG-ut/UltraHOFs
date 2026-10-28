@@ -1,0 +1,17 @@
+# Conda-forge runtime dependencies of the UltraHOFs image (versions verified by the test suite).
+# Used by deploy/Dockerfile and the CI workflow; pip packages are pinned in deploy/constraints.txt.
+name: ultrahofs-runtime
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - rdkit=2026.09.1
+  - pymatgen=2026.9.24
+  - ase=3.29.0
+  - spglib=2.8.0
+  - gemmi=0.7.5
+  - zeopp-lsmo=0.4.7
+  - numpy=2.5.4
+  - scipy=1.18.1
+  - networkx=3.7

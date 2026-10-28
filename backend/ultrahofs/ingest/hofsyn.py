@@ -328,11 +328,11 @@ def ingest_hofsyn(db: Session, base: Path | None = None, *, workers: int = 8, li
         if path:
             dst = cif_dir / "raw" / f"{e.id}.cif"
             shutil.copyfile(path, dst)
-            e.cif_raw_path = str(dst)
+            e.cif_raw_path = s.rel_var_path(dst)
         if result.get("framework_cif"):
             dst = cif_dir / "framework" / f"{e.id}.cif"
             dst.write_text(result["framework_cif"])
-            e.cif_clean_path = str(dst)
+            e.cif_clean_path = s.rel_var_path(dst)
             e.cleaning_log = ["removed solvent/guest molecules: " + ", ".join(
                 sorted({m["smiles"] for m in result.get("molecules", []) if m["role"] in ("solvent", "guest")})
             )[:900]]

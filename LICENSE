@@ -1,0 +1,27 @@
+UltraHOFs — Licence
+Copyright (c) 2026 Ultra-X (知声无界). All rights reserved.
+
+1. Permitted use. You may view the source code in this repository and run the unmodified software
+   for your own non-commercial evaluation, including in GitHub Codespaces as described in README.md.
+
+2. Restrictions. No other rights are granted. Without prior written permission from Ultra-X you may
+   not modify the software, create derivative works, copy or redistribute it (in source or binary
+   form, including container images), sublicense or sell it, use it for commercial purposes, or
+   use it to provide a service to third parties. Forking on GitHub is allowed only to the extent
+   required by the GitHub Terms of Service.
+
+3. Third-party material. Third-party software, fonts and data included in or downloaded by this
+   software remain under their own licences (see THIRD_PARTY_NOTICES.md). In particular, the
+   experimental HOF database (the data bundle ultrahofs-data-*.tar.gz and its contents) is derived
+   from the HOFSyn dataset and is distributed under the Creative Commons Attribution 4.0
+   International licence (CC BY 4.0). Nothing in this licence restricts the rights granted by
+   those licences.
+
+4. No warranty. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+   AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+   Generated structures and scores are hypothetical models, not experimental results.
+
+For permissions beyond this licence, contact Ultra-X via https://github.com/JiaaoWANG-ut.

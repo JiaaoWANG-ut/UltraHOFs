@@ -19,6 +19,8 @@ const zh = {
   },
   login: {
     title: '登录', username: '用户名', password: '密码', submit: '登录', failed: '登录失败',
+    demoTitle: '在线试用环境', demoDesc: '这是你自己的试用环境（如 GitHub Codespaces），数据只保存在其中。',
+    demoEnter: '一键进入试用', orPassword: '或使用账号密码登录',
     lead: '从分子到晶体：设计、构建并追溯每一个氢键有机框架。',
     points: ['已报道 HOF 实验数据库与完整文献引用', '基于合成子规则的可解释分子生成', '拓扑驱动的周期结构构建与 MACE-OFF24 优化'],
   },
@@ -117,6 +119,8 @@ const en: typeof zh = {
   },
   login: {
     title: 'Sign in', username: 'Username', password: 'Password', submit: 'Sign in', failed: 'Sign-in failed',
+    demoTitle: 'Trial environment', demoDesc: 'This is your own trial environment (e.g. GitHub Codespaces); your data stay inside it.',
+    demoEnter: 'Enter the demo', orPassword: 'or sign in with a password',
     lead: 'From molecule to crystal: design, build and trace every hydrogen-bonded framework.',
     points: ['Experimental HOF database with full citations', 'Explainable synthon-based molecule generation',
       'Topology-driven periodic structures with MACE-OFF24 relaxation'],

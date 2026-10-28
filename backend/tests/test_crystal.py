@@ -192,3 +192,22 @@ def test_zeopp_on_porous_layer(tma_bb):
     pm = analyze_cif(write_cif(out.to_ase(), "tma"))
     assert pm["lcd_A"] > pm["pld_A"] > 0
     assert 0 < pm["void_fraction_geometric"] < 1
+
+
+def test_dedupe_collapses_stacked_symmetry_copies():
+    """CIFs that list a whole cell *and* symmetry operators expand into dozens of coincident copies."""
+    import time
+
+    from ase import Atoms
+
+    from ultrahofs.analysis.cif_molecules import dedupe_overlaps
+
+    rng = np.random.default_rng(0)
+    base = dedupe_overlaps(Atoms("C" * 400, scaled_positions=rng.random((400, 3)), cell=[30, 30, 30], pbc=True))
+    copies = 24
+    stacked = Atoms(base.get_chemical_symbols() * copies, cell=base.cell, pbc=True,
+                    positions=np.tile(base.positions, (copies, 1)) + rng.normal(0, 1e-3, (copies * len(base), 3)))
+    t0 = time.time()
+    out = dedupe_overlaps(stacked)
+    assert len(out) == len(base)
+    assert time.time() - t0 < 10

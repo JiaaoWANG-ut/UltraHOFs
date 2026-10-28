@@ -121,6 +121,13 @@ def dedupe_overlaps(atoms: Atoms, tol: float = 0.6) -> Atoms:
 
     if len(atoms) == 0:
         return atoms
+    # Collapse coincident atoms first (cheap). Some CIFs list the whole unit cell *and* its symmetry
+    # operators; expanding them stacks dozens of copies per site, which makes the neighbour list explode.
+    frac = atoms.get_scaled_positions(wrap=True)
+    grid = np.rint(frac * 2000).astype(np.int64) % 2000
+    _, first = np.unique(np.column_stack([grid, atoms.numbers]), axis=0, return_index=True)
+    if len(first) < len(atoms):
+        atoms = atoms[np.sort(first)]
     i, j = neighbor_list("ij", atoms, tol)
     drop = set()
     for a, b in zip(i, j, strict=True):

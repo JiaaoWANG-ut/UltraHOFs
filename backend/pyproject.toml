@@ -22,12 +22,12 @@ dependencies = [
   "numpy",
   "scipy",
   "networkx",
-  "pormake>=0.2.3",
   "py2opsin>=1.0",
 ]
 
 [project.optional-dependencies]
 relax = ["mace-torch>=0.3.10", "torch"]
+nets = ["pormake>=0.2.3"]  # only for scripts/build_net_cache.py
 dev = ["pytest>=8", "pytest-cov", "ruff"]
 
 [project.scripts]

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from .. import __version__
 from ..analysis.zeopp import zeopp_available
+from ..config import get_settings
 from ..db import get_db
 from ..models import DataSource, GeneratedStructure, HOFEntry, Job, Molecule, Reference, User
 from ..relax.engine import model_available
@@ -37,7 +38,7 @@ SOFTWARE = [
 
 @router.get("/health", tags=["meta"])
 def health() -> dict:
-    return {"status": "ok", "version": __version__}
+    return {"status": "ok", "version": __version__, "demo_mode": get_settings().demo_mode}
 
 
 @router.get("/meta/overview", tags=["meta"])

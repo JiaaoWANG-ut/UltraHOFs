@@ -1,6 +1,6 @@
-import { Alert, Button, Form, Input } from 'antd';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { Alert, Button, Divider, Form, Input } from 'antd';
+import { ExperimentOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
@@ -9,11 +9,18 @@ import { setLanguage } from '../i18n';
 
 export default function LoginPage() {
   const { t, i18n } = useTranslation();
-  const { login, user } = useAuth();
+  const { login, demoLogin, user } = useAuth();
   const nav = useNavigate();
   const loc = useLocation() as { state?: { from?: string } };
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const [demo, setDemo] = useState(false);
+  useEffect(() => {
+    fetch('/api/v1/health')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((h) => setDemo(Boolean(h?.demo_mode)))
+      .catch(() => setDemo(false));
+  }, []);
   if (user) return <Navigate to={loc.state?.from || '/'} replace />;
   const points = t('login.points', { returnObjects: true }) as string[];
 
@@ -22,6 +29,19 @@ export default function LoginPage() {
     setErr('');
     try {
       await login(v.username, v.password);
+      nav(loc.state?.from || '/', { replace: true });
+    } catch (e: any) {
+      setErr(e.message || t('login.failed'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const enterDemo = async () => {
+    setBusy(true);
+    setErr('');
+    try {
+      await demoLogin();
       nav(loc.state?.from || '/', { replace: true });
     } catch (e: any) {
       setErr(e.message || t('login.failed'));
@@ -55,6 +75,18 @@ export default function LoginPage() {
             UltraHOFs · {t('brand.tagline')}
           </div>
           {err ? <Alert type="error" showIcon message={err} style={{ marginBottom: 16 }} /> : null}
+          {demo ? (
+            <div data-testid="demo-box">
+              <Alert type="info" showIcon message={t('login.demoTitle')} description={t('login.demoDesc')}
+                style={{ marginBottom: 14, background: 'var(--gold-soft)', borderColor: '#e2d3b5' }} />
+              <Button type="primary" size="large" block icon={<ExperimentOutlined />} loading={busy} onClick={enterDemo} data-testid="demo-enter">
+                {t('login.demoEnter')}
+              </Button>
+              <Divider plain className="muted" style={{ fontSize: 12.5 }}>
+                {t('login.orPassword')}
+              </Divider>
+            </div>
+          ) : null}
           <Form layout="vertical" onFinish={submit} requiredMark={false}>
             <Form.Item name="username" label={t('login.username')} rules={[{ required: true }]}>
               <Input size="large" prefix={<UserOutlined />} autoComplete="username" />

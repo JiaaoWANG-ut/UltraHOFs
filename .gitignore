@@ -1,4 +1,6 @@
 # data & runtime state (never commit)
+deploy/seed/
+build/
 data/raw/
 var/
 .env

@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from ..config import get_settings
 from ..db import get_db
 from ..models import GeneratedStructure, HOFEntry, Job, Molecule, Project, ProjectItem, User
 from ..security import decode_token, hash_password, make_token, verify_password
@@ -38,6 +39,22 @@ def login(body: LoginIn, db: Session = Depends(get_db)) -> dict:
     u = db.execute(select(User).where(User.username == body.username)).scalar_one_or_none()
     if u is None or not u.is_active or not verify_password(body.password, u.password_hash):
         raise HTTPException(401, "invalid username or password")
+    u.last_login_at = datetime.now(UTC)
+    db.commit()
+    return {"access_token": make_token(u.id, "access"), "refresh_token": make_token(u.id, "refresh"),
+            "token_type": "bearer", "user": user_dict(u)}
+
+
+@router.post("/auth/demo", tags=["auth"])
+def demo_login(db: Session = Depends(get_db)) -> dict:
+    """Password-less login as the demo user; only available when the server runs in demo mode."""
+    from ..bootstrap import DEMO_USER
+
+    if not get_settings().demo_mode:
+        raise HTTPException(404, "Not Found")
+    u = db.execute(select(User).where(User.username == DEMO_USER)).scalar_one_or_none()
+    if u is None or not u.is_active:
+        raise HTTPException(503, "demo user is not set up; run `ultrahofs init-db`")
     u.last_login_at = datetime.now(UTC)
     db.commit()
     return {"access_token": make_token(u.id, "access"), "refresh_token": make_token(u.id, "refresh"),

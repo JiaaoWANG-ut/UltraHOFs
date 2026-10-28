@@ -6,6 +6,7 @@ interface AuthState {
   user: Json | null;
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
+  demoLogin: () => Promise<void>;
   logout: () => void;
   isCurator: boolean;
   isAdmin: boolean;
@@ -42,6 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!localStorage.getItem('uh_lang') && d.user?.locale) setLanguage(d.user.locale);
   }, []);
 
+  const demoLogin = useCallback(async () => {
+    const d = await api.post('/auth/demo');
+    tokens.set(d.access_token, d.refresh_token);
+    setUser(d.user);
+  }, []);
+
   const logout = useCallback(() => {
     tokens.clear();
     setUser(null);
@@ -49,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const role = user?.role;
   return (
-    <Ctx.Provider value={{ user, loading, login, logout, isCurator: role === 'curator' || role === 'admin', isAdmin: role === 'admin' }}>
+    <Ctx.Provider value={{ user, loading, login, demoLogin, logout, isCurator: role === 'curator' || role === 'admin', isAdmin: role === 'admin' }}>
       {children}
     </Ctx.Provider>
   );

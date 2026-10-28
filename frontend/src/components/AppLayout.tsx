@@ -81,7 +81,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <Footer style={{ textAlign: 'center', borderTop: '1px solid var(--line)' }}>
         <Typography.Text className="footer-brand muted">{t('footer')}</Typography.Text>
         <span className="muted" style={{ marginLeft: 16, fontSize: 12 }}>
-          © {new Date().getFullYear()} · <Link to="/about">{t('nav.about')}</Link>
+          © 2026 Ultra-X 知声无界 · All rights reserved · <Link to="/about">{t('nav.about')}</Link>
         </span>
       </Footer>
     </Layout>

@@ -43,7 +43,7 @@ def create_app() -> FastAPI:
     for r in (meta.router, auth.router, hofs.router, design.router, build.router):
         app.include_router(r, prefix="/api/v1")
 
-    dist = REPO_ROOT / "frontend" / "dist"
+    dist = s.web_dir or (REPO_ROOT / "frontend" / "dist")
     if dist.exists():
         app.mount("/assets", StaticFiles(directory=dist / "assets"), name="assets")
         for sub in ("fonts", "brand"):
