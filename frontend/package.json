@@ -1,0 +1,45 @@
+{
+  "name": "ultrahofs-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "UltraHOFs web UI — 知声无界 / Ultra-X",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b",
+    "preview": "vite preview --host 127.0.0.1 --port 4173",
+    "fonts": "node scripts/build-fonts.mjs",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^6.3.4",
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/noto-sans-sc": "^5.3.1",
+    "@tanstack/react-query": "^5.105.0",
+    "3dmol": "^2.5.5",
+    "antd": "^6.6.8",
+    "echarts": "^6.1.0",
+    "echarts-for-react": "^3.0.6",
+    "i18next": "^26.5.11",
+    "ketcher-core": "^3.18.0",
+    "ketcher-react": "^3.18.0",
+    "ketcher-standalone": "^3.18.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-i18next": "^17.1.9",
+    "react-router-dom": "^7.18.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "cn-font-split": "^7.4.3",
+    "typescript": "~5.9.3",
+    "vite": "^8.3.5"
+  }
+}

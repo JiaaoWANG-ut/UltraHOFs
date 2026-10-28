@@ -1,0 +1,24 @@
+# data & runtime state (never commit)
+data/raw/
+var/
+.env
+*.db
+
+# python
+# PORMAKE writes runtime.log when scripts/build_net_cache.py runs
+runtime.log
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# frontend
+frontend/node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+
+# editors
+.vscode/
+.idea/

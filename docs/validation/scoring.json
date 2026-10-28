@@ -1,0 +1,77 @@
+{
+  "experimental_all": {
+    "n": 296,
+    "median": 48.8,
+    "p10": 20.2,
+    "p90": 86.1
+  },
+  "experimental_with_classical_synthon": {
+    "n": 213,
+    "median": 60.6,
+    "p10": 34.8,
+    "p90": 87.5
+  },
+  "experimental_with_>=3_synthons": {
+    "n": 118,
+    "median": 82.9,
+    "p10": 46.0,
+    "p90": 89.9
+  },
+  "background_all": {
+    "n": 78,
+    "median": 27.9,
+    "p10": 17.2,
+    "p90": 48.8
+  },
+  "background_with_classical_synthon": {
+    "n": 52,
+    "median": 33.4,
+    "p10": 20.6,
+    "p90": 53.8
+  },
+  "auc_all": 0.725,
+  "auc_classical_domain": 0.869,
+  "fraction_experimental_without_classical_synthon": 0.28,
+  "top_background": [
+    [
+      "OC(=O)c1ccc(cc1)C(O)=O",
+      58.5,
+      2
+    ],
+    [
+      "OC(=O)c1ccccc1C(O)=O",
+      55.8,
+      2
+    ],
+    [
+      "OC(=O)C1CCC(CC1)C(O)=O",
+      55.1,
+      2
+    ],
+    [
+      "OC(=O)CC(O)=O",
+      55.0,
+      2
+    ],
+    [
+      "OC(=O)c1cccc(C(O)=O)c1",
+      54.1,
+      2
+    ],
+    [
+      "OC(=O)CC(O)(CC(O)=O)C(O)=O",
+      53.8,
+      3
+    ],
+    [
+      "OC(=O)C=CC(O)=O",
+      51.9,
+      2
+    ],
+    [
+      "O=C(O)CNC(=O)c1ccccc1",
+      48.8,
+      2
+    ]
+  ]
+}

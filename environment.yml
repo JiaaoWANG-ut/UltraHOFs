@@ -1,0 +1,19 @@
+# UltraHOFs development environment.
+# Create on NERSC:
+#   module load conda
+#   mamba env create -p /global/cfs/cdirs/m4517/jiaao/envs/ultrahofs -f environment.yml
+#   conda activate /global/cfs/cdirs/m4517/jiaao/envs/ultrahofs
+#   pip install -e "./backend[dev,relax]"
+name: ultrahofs
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - rdkit
+  - pymatgen
+  - ase
+  - spglib
+  - gemmi
+  - zeopp-lsmo
+  - nodejs=22
