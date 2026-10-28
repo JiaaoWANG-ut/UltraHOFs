@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import tempfile
 
 _TMP = tempfile.mkdtemp(prefix="ultrahofs_test_")
@@ -17,6 +18,10 @@ TMA = "OC(=O)c1cc(C(O)=O)cc(C(O)=O)c1"
 ATC = "OC(=O)C12CC3(C(O)=O)CC(C(O)=O)(C1)CC(C(O)=O)(C3)C2"
 TTBI = "O=c1[nH]c2cc3c(cc2[nH]1)C1c2cc4[nH]c(=O)[nH]c4cc2C3c2cc3[nH]c(=O)[nH]c3cc21"
 MTB = "OC(=O)c1ccc(C(c2ccc(C(O)=O)cc2)(c2ccc(C(O)=O)cc2)c2ccc(C(O)=O)cc2)cc1"
+
+
+def pytest_sessionfinish(session, exitstatus) -> None:  # noqa: ARG001
+    shutil.rmtree(_TMP, ignore_errors=True)
 
 
 @pytest.fixture(scope="session")
